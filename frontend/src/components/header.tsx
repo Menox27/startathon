@@ -24,8 +24,9 @@ export function Header({ user }: { user: User }) {
     },
     onSuccess: () => {
       reset();
-      qc.clear();
+      // keep the observed "me" query (clear() would orphan its observer), drop all other user data
       qc.setQueryData(["me"], null);
+      qc.removeQueries({ predicate: (q) => q.queryKey[0] !== "me" });
     },
   });
 

@@ -51,7 +51,7 @@ export function ChatSection({ user }: { user: User }) {
   const active = chats.data?.mine.find((c) => c.id === activeChatId);
 
   return (
-    <Card className="grid h-[640px] overflow-hidden md:grid-cols-[230px_minmax(0,1fr)]">
+    <Card className="grid h-[640px] overflow-hidden md:grid-cols-[250px_minmax(0,1fr)]">
       <aside className="flex min-h-0 flex-col gap-4 overflow-y-auto border-b border-border bg-muted/40 p-3 md:border-r md:border-b-0">
         <div className="flex flex-wrap gap-2">
           <CreateChatDialog user={user} onCreated={opened} />
@@ -88,8 +88,8 @@ export function ChatSection({ user }: { user: User }) {
             {chats.data?.publicChannels.map((c) => (
               <li key={c.id} className="flex items-center justify-between gap-2 px-2 py-1 text-sm">
                 <span className="min-w-0">
-                  <span className="flex items-center gap-1 truncate">
-                    <Hash className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                  <span className="flex items-start gap-1 break-words">
+                    <Hash className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                     {c.name}
                   </span>
                   <span className="text-xs text-muted-foreground">{c.memberCount} Mitglieder</span>
