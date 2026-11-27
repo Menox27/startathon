@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  CLUB
+  OFFICE
+}
+
+enum EventStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ChatType {
+  PUBLIC_CLUB
+  PRIVATE_GROUP
+  DIRECT
+}
+
+/// Identity comes from the university SSO. There is no API to change fullName, uniId or role.
+model User {
+  id          String       @id @default(cuid())
+  uniId       String       @unique
+  fullName    String
+  role        Role
+  createdAt   DateTime     @default(now())
+  events      Event[]
+  memberships ChatMember[]
+  messages    Message[]
+  chatsOwned  ChatRoom[]
+}
+
+model Building {
+  id          String  @id
+  name        String
+  description String?
+  events      Event[]
+}
+
+model Event {
+  id          String      @id @default(cuid())
+  title       String
+  description String?
+  buildingId  String
+  building    Building    @relation(fields: [buildingId], references: [id])
+  startTime   DateTime
+  endTime     DateTime
+  status      EventStatus
+  createdById String
+  createdBy   User        @relation(fields: [createdById], references: [id])
+  createdAt   DateTime    @default(now())
+
+  @@index([status, startTime])
+}
+
+model ChatRoom {
+  id          String       @id @default(cuid())
+  name        String?
+  type        ChatType
+  /// "<userIdA>:<userIdB>" sorted, only for DIRECT. Guarantees one DM per pair.
+  directKey   String?      @unique
+  createdById String?
+  createdBy   User?        @relation(fields: [createdById], references: [id])
+  createdAt   DateTime     @default(now())
+  members     ChatMember[]
+  messages    Message[]
+
+  @@index([type])
+}
+
+model ChatMember {
+  roomId   String
+  userId   String
+  room     ChatRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id])
+  joinedAt DateTime @default(now())
+
+  @@id([roomId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  roomId    String
+  room      ChatRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  senderId  String
+  sender    User     @relation(fields: [senderId], references: [id])
+  body      String
+  createdAt DateTime @default(now())
+
+  @@index([roomId, createdAt])
+}
