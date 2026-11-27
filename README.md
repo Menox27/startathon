@@ -14,6 +14,14 @@ npm run dev                                   # API auf http://localhost:4000
 cd ../frontend && cp .env.example .env.local && npm install && npm run dev   # http://localhost:3000
 ```
 
+Mobile Web-App (PWA, eigener Ordner, unabhängig vom Web-Frontend):
+
+```bash
+cd mobile && cp .env.example .env.local && npm install && npm run dev   # http://localhost:3001
+```
+
+Die Backend-CORS-Freigabe dafür steuert `MOBILE_ORIGIN` (Standard `http://localhost:3001`).
+
 JWT_SECRET in `backend/.env` durch einen zufälligen String (≥ 32 Zeichen) ersetzen.
 
 ## Demo-Tipps

@@ -22,17 +22,19 @@ declare module "fastify" {
 }
 
 export async function buildApp() {
+  const origins = [env.FRONTEND_ORIGIN, env.MOBILE_ORIGIN].filter(Boolean);
+
   const app = Fastify({ logger: env.NODE_ENV !== "test" });
 
   await app.register(cors, {
-    origin: env.FRONTEND_ORIGIN,
+    origin: origins,
     credentials: true,
     methods: ["GET", "POST", "PATCH", "DELETE"],
   });
   await app.register(cookie);
   await app.register(jwt, { secret: env.JWT_SECRET, cookie: { cookieName: COOKIE_NAME, signed: false } });
 
-  const io = new Server(app.server, { cors: { origin: env.FRONTEND_ORIGIN, credentials: true } });
+  const io = new Server(app.server, { cors: { origin: origins, credentials: true } });
   app.decorate("io", io);
   setupSocket(app, io);
 

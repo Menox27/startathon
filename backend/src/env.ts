@@ -12,6 +12,8 @@ export const env = z
     REDIS_URL: z.string().default("redis://localhost:6379"),
     JWT_SECRET: z.string().min(32, "JWT_SECRET must be at least 32 characters"),
     FRONTEND_ORIGIN: z.string().default("http://localhost:3000"),
+    // the separate mobile web app (mobile/); empty string disables it
+    MOBILE_ORIGIN: z.string().default("http://localhost:3001"),
     PORT: z.coerce.number().default(4000),
     NODE_ENV: z.string().default("development"),
     // Mock SSO lets anyone log in as any persona. Disable it once a real IdP is connected.
