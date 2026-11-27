@@ -72,14 +72,14 @@ test("public channels: only CLUB/OFFICE create, anyone joins; DMs only between s
 });
 
 test("presence: building id only, count hidden below 3", async () => {
-  await redis.del("presence:building:laborbau");
-  assert.equal((await as("student", { method: "POST", url: "/api/presence/heartbeat", payload: { buildingId: "laborbau", lat: 1, lng: 2 } })).statusCode, 400);
+  await redis.del("presence:building:maschinenbau");
+  assert.equal((await as("student", { method: "POST", url: "/api/presence/heartbeat", payload: { buildingId: "maschinenbau", lat: 1, lng: 2 } })).statusCode, 400);
   const count = async () =>
-    (await as("student", { url: "/api/buildings" })).json().buildings.find((b: { id: string }) => b.id === "laborbau").presenceCount;
-  await as("student", { method: "POST", url: "/api/presence/heartbeat", payload: { buildingId: "laborbau" } });
-  await as("student2", { method: "POST", url: "/api/presence/heartbeat", payload: { buildingId: "laborbau" } });
+    (await as("student", { url: "/api/buildings" })).json().buildings.find((b: { id: string }) => b.id === "maschinenbau").presenceCount;
+  await as("student", { method: "POST", url: "/api/presence/heartbeat", payload: { buildingId: "maschinenbau" } });
+  await as("student2", { method: "POST", url: "/api/presence/heartbeat", payload: { buildingId: "maschinenbau" } });
   assert.equal(await count(), null);
-  await as("student3", { method: "POST", url: "/api/presence/heartbeat", payload: { buildingId: "laborbau" } });
+  await as("student3", { method: "POST", url: "/api/presence/heartbeat", payload: { buildingId: "maschinenbau" } });
   assert.equal(await count(), 3);
   await as("student3", { method: "DELETE", url: "/api/presence" });
   assert.equal(await count(), null);

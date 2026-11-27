@@ -23,7 +23,7 @@ type CampusState = {
 const initial = () => ({
   connectEnabled: false,
   simLocation: "bibliothek",
-  campus: "mitte" as CampusId,
+  campus: "ignaz" as CampusId,
   day: format(new Date(), "yyyy-MM-dd"),
   selectedBuildingId: null,
   openEventId: null,

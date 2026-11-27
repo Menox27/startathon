@@ -14,18 +14,18 @@ export const PERSONAS = {
 
 export type PersonaKey = keyof typeof PERSONAS;
 
+// THWS Schweinfurt. Ids match the map shapes in frontend/src/lib/campus.ts.
 export const BUILDINGS = [
-  { id: "hoersaalzentrum", name: "Hörsaalzentrum", description: "Hörsäle H1–H6" },
+  // Campus I, Ignaz-Schön-Straße
+  { id: "itgebaeude", name: "IT-Gebäude", description: "Rechenzentrum & IT-Service" },
+  { id: "hauptgebaeude", name: "Hauptgebäude", description: "Hörsäle, Studierendenservice & Hochschulbüro" },
+  { id: "hochspannung", name: "Hochspannungsgebäude", description: "Hochspannungslabor" },
+  { id: "elektrotechnik", name: "Fakultät Elektrotechnik", description: "Labore & Seminarräume E-Technik" },
+  { id: "maschinenbau", name: "Fakultät Maschinenbau", description: "Werkstätten & Labore Maschinenbau" },
   { id: "bibliothek", name: "Bibliothek", description: "Lesesäle & Gruppenräume" },
-  { id: "mensa", name: "Mensa", description: "Mittagessen 11:00–14:30" },
-  { id: "laborbau", name: "Laborbau", description: "Labore Maschinenbau & E-Technik" },
-  { id: "audimax", name: "Audimax", description: "Großer Hörsaal, 800 Plätze" },
-  { id: "verwaltungsbau", name: "Verwaltungsbau", description: "Studierendenservice & Hochschulbüro" },
-  // Campus Nord
-  { id: "technikum", name: "Technikum", description: "Werkstätten, Robotik- & Fahrzeuglabor" },
-  { id: "seminarbau", name: "Seminarbau", description: "Seminarräume S1–S24" },
-  { id: "cafeteria", name: "Cafeteria Nord", description: "Snacks & Kaffee 8:00–17:00" },
-  { id: "gruenderzentrum", name: "Gründerzentrum", description: "Coworking & Start-up-Beratung" },
-  { id: "designwerkstatt", name: "Designwerkstatt", description: "Ateliers, 3D-Druck & Fotostudio" },
-  { id: "sporthalle", name: "Sporthalle", description: "Hochschulsport, Kletterwand" },
+  { id: "mensa", name: "Mensa", description: "Mittagessen 11:00–14:00" },
+  { id: "rundbau", name: "Rundbau", description: "Großer Hörsaal" },
+  // Campus Ledward, Konrad-Zuse-Straße
+  { id: "neubau", name: "Neubau", description: "Seminarräume Campus Ledward" },
+  { id: "campus3", name: "Campus III", description: "Hauptgebäude Campus Ledward" },
 ];

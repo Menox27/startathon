@@ -32,14 +32,13 @@ export function CampusMap({ user }: { user: User }) {
   return (
     <Card className="relative h-full overflow-hidden">
       <CampusSvg
-        campus={campus}
-        label={`Karte ${CAMPUSES[campus].label}`}
+        label={`Karte ${CAMPUSES[campus].label}, ${CAMPUSES[campus].street}`}
         eventCounts={counts}
         presence={presence}
         selectedId={selectedBuildingId}
         onSelect={(id) => selectBuilding(selectedBuildingId === id ? null : id)}
         marker={marker}
-        viewBox="-20 -90 840 640"
+        frame={CAMPUSES[campus].frame}
         className="absolute inset-0 h-full w-full"
       />
 

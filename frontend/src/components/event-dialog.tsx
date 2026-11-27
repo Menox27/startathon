@@ -61,8 +61,9 @@ function EventSheet({ event: e, user }: { event: CampusEvent; user: User }) {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["events"] }),
   });
 
-  const cx = shape.x + shape.w / 2;
-  const cy = shape.y + shape.h / 2;
+  const [bx, by, bw, bh] = shape.box;
+  const cx = bx + bw / 2;
+  const cy = by + bh / 2;
 
   return (
     <DialogContent className="max-w-3xl gap-0 p-0 md:grid-cols-[minmax(0,1fr)_300px]">
@@ -145,13 +146,11 @@ function EventSheet({ event: e, user }: { event: CampusEvent; user: User }) {
 
       <aside className="relative flex flex-col border-t border-border md:border-t-0 md:border-l">
         <CampusSvg
-          campus={shape.campus}
           label={`Lage von ${shape.label} auf dem ${CAMPUSES[shape.campus].label}`}
           eventCounts={{ [shape.id]: 1 }}
           badges={false}
           selectedId={shape.id}
-          viewBox={`${cx - 200} ${cy - 230} 400 460`}
-          preserveAspectRatio="xMidYMid slice"
+          frame={[cx - 110, cy - 120, 220, 240]}
           className="h-56 w-full md:h-auto md:flex-1"
         />
         <div className="border-t border-border bg-white/60 px-5 py-4">

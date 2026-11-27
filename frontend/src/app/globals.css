@@ -92,6 +92,22 @@ body {
     0 4px 14px -4px rgb(20 30 60 / 0.22);
 }
 
+/* Buildings with events breathe softly. */
+@keyframes glow {
+  50% {
+    opacity: 0.35;
+  }
+}
+.bld-glow {
+  opacity: 0.85;
+  animation: glow 2.6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bld-glow {
+    animation: none;
+  }
+}
+
 /* The one authored motion: sheets condense out of the blur. */
 @keyframes sheet-in {
   from {

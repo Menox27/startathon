@@ -28,7 +28,7 @@ export function CalendarPanel({ user }: { user: User }) {
   const date = parseISO(day);
   const week = Array.from({ length: 7 }, (_, i) => addDays(startOfWeek(date, { weekStartsOn: 1 }), i));
   const list = onCampus.filter((e) => overlapsDay(e, day));
-  const other: CampusId = campus === "mitte" ? "nord" : "mitte";
+  const other: CampusId = campus === "ignaz" ? "ledward" : "ignaz";
   const elsewhere = all.filter((e) => SHAPE_BY_ID[e.buildingId]?.campus === other && overlapsDay(e, day)).length;
 
   return (
