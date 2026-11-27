@@ -9,6 +9,7 @@ const heartbeatBody = z.object({ buildingId: z.string().min(1) }).strict();
 
 export async function presenceRoutes(app: FastifyInstance) {
   app.post("/api/presence/heartbeat", async (req) => {
+    if (req.user.role !== "STUDENT") fail(403, "Only students share presence");
     const { buildingId } = heartbeatBody.parse(req.body);
     if (!(await prisma.building.findUnique({ where: { id: buildingId } }))) fail(400, "Unknown building");
     await recordHeartbeat(redis, req.user.sub, buildingId);

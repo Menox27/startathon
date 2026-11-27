@@ -43,6 +43,7 @@ export function setupSocket(app: FastifyInstance, io: Server) {
       const { roomId, body } = parsed.data;
       // Membership is re-checked on every message, never trusted from the client.
       if (!(await isMember(roomId, userId))) return ack?.({ ok: false, error: "Chat not found" });
+      socket.join(`room:${roomId}`); // sender may not have joined yet (e.g. right after an invite)
       const message = await prisma.message.create({
         data: { roomId, senderId: userId, body },
         include: { sender: { select: { id: true, fullName: true, role: true } } },
