@@ -1,16 +1,15 @@
 "use client";
 
-import { CalendarDays, MessagesSquare, ShieldCheck } from "lucide-react";
 import { useEffect } from "react";
 import type { User } from "@/lib/api";
 import { usePresenceHeartbeat } from "@/lib/queries";
 import { getSocket } from "@/lib/socket";
-import { BuildingPanel } from "./building-panel";
-import { CalendarSection, ModerationPanel } from "./calendar-section";
+import { CalendarPanel } from "./calendar-section";
 import { CampusMap } from "./campus-map";
 import { ChatSection } from "./chat-section";
+import { ConnectPanel } from "./connect-panel";
+import { EventDialog } from "./event-dialog";
 import { Header } from "./header";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
 export function Dashboard({ user }: { user: User }) {
   usePresenceHeartbeat(user.role);
@@ -24,42 +23,23 @@ export function Dashboard({ user }: { user: User }) {
   }, [user.id]);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-dvh">
       <Header user={user} />
-      <main className="mx-auto grid max-w-[1440px] gap-6 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:p-6">
-        <section className="space-y-4">
-          <CampusMap role={user.role} />
-          <BuildingPanel />
+      <main className="mx-auto grid max-w-[1480px] gap-5 px-4 pb-8 lg:grid-cols-12 lg:px-6">
+        <section aria-label="Kalender" className="h-[560px] lg:col-span-4 lg:h-[640px]">
+          <CalendarPanel user={user} />
         </section>
-        <section>
-          <Tabs defaultValue="calendar">
-            <TabsList>
-              <TabsTrigger value="calendar">
-                <CalendarDays className="h-4 w-4" /> Kalender
-              </TabsTrigger>
-              <TabsTrigger value="chat">
-                <MessagesSquare className="h-4 w-4" /> Chats
-              </TabsTrigger>
-              {user.role === "OFFICE" && (
-                <TabsTrigger value="moderation">
-                  <ShieldCheck className="h-4 w-4" /> Moderation
-                </TabsTrigger>
-              )}
-            </TabsList>
-            <TabsContent value="calendar">
-              <CalendarSection user={user} />
-            </TabsContent>
-            <TabsContent value="chat">
-              <ChatSection user={user} />
-            </TabsContent>
-            {user.role === "OFFICE" && (
-              <TabsContent value="moderation">
-                <ModerationPanel />
-              </TabsContent>
-            )}
-          </Tabs>
+        <section aria-label="Campus-Karte" className="h-[460px] sm:h-[540px] lg:col-span-8 lg:h-[640px]">
+          <CampusMap user={user} />
+        </section>
+        <section aria-label="Chats" className="h-[600px] lg:col-span-7 lg:h-[500px]">
+          <ChatSection user={user} />
+        </section>
+        <section aria-label="Connect" className="min-h-[300px] lg:col-span-5 lg:h-[500px]">
+          <ConnectPanel user={user} />
         </section>
       </main>
+      <EventDialog user={user} />
     </div>
   );
 }

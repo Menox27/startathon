@@ -51,8 +51,8 @@ export function ChatSection({ user }: { user: User }) {
   const active = chats.data?.mine.find((c) => c.id === activeChatId);
 
   return (
-    <Card className="grid h-[640px] overflow-hidden md:grid-cols-[250px_minmax(0,1fr)]">
-      <aside className="flex min-h-0 flex-col gap-4 overflow-y-auto border-b border-border bg-muted/40 p-3 md:border-r md:border-b-0">
+    <Card className="grid h-full overflow-hidden md:grid-cols-[250px_minmax(0,1fr)]">
+      <aside className="flex min-h-0 flex-col gap-4 overflow-y-auto border-b border-border bg-white/30 p-3 md:border-r md:border-b-0">
         <div className="flex flex-wrap gap-2">
           <CreateChatDialog user={user} onCreated={opened} />
           {user.role === "STUDENT" && <DirectMessageDialog onCreated={opened} />}
@@ -69,8 +69,8 @@ export function ChatSection({ user }: { user: User }) {
                   <button
                     onClick={() => setActiveChat(c.id)}
                     className={cn(
-                      "flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm hover:bg-card",
-                      activeChatId === c.id && "bg-card font-medium shadow-sm",
+                      "flex w-full cursor-pointer items-center gap-2 rounded-xl px-2 py-1.5 text-left text-sm hover:bg-white/70",
+                      activeChatId === c.id && "bg-white font-medium shadow-sm",
                     )}
                   >
                     <Icon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
@@ -171,7 +171,7 @@ function ChatWindow({ chat, user }: { chat: MyChat; user: User }) {
           return (
             <div key={m.id} className={cn("flex flex-col", own ? "items-end" : "items-start")}>
               {!own && <span className="mb-0.5 text-xs text-muted-foreground">{m.sender.fullName}</span>}
-              <div className={cn("max-w-[80%] rounded-2xl px-3 py-2 text-sm", own ? "bg-primary text-primary-foreground" : "bg-muted")}>
+              <div className={cn("max-w-[80%] rounded-2xl px-3 py-2 text-sm", own ? "bg-primary text-primary-foreground" : "bg-white/85 ring-1 ring-border")}>
                 <p className="break-words whitespace-pre-wrap">{m.body}</p>
               </div>
               <span className="mt-0.5 text-[10px] text-muted-foreground">{format(new Date(m.createdAt), "HH:mm")}</span>
@@ -213,7 +213,7 @@ function UserSearch({ onPick, exclude = [], studentsOnly }: { onPick: (u: Public
               <button
                 type="button"
                 onClick={() => onPick(u)}
-                className="flex w-full cursor-pointer items-center justify-between rounded-md px-2 py-1.5 text-sm hover:bg-muted"
+                className="flex w-full cursor-pointer items-center justify-between rounded-xl px-2 py-1.5 text-sm hover:bg-black/5"
               >
                 {u.fullName}
                 <span className="text-xs text-muted-foreground">{ROLE_LABEL[u.role]}</span>

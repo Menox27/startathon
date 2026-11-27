@@ -84,3 +84,14 @@ test("presence: building id only, count hidden below 3", async () => {
   await as("student3", { method: "DELETE", url: "/api/presence" });
   assert.equal(await count(), null);
 });
+
+test("attend: only approved events, idempotent, withdraw", async () => {
+  const body = { title: "Attend", buildingId: "mensa", startTime: new Date().toISOString(), endTime: new Date(Date.now() + 3600e3).toISOString() };
+  const pending = (await as("student", { method: "POST", url: "/api/events", payload: body })).json().event.id;
+  assert.equal((await as("student2", { method: "POST", url: `/api/events/${pending}/attend` })).statusCode, 404);
+  const id = (await as("club", { method: "POST", url: "/api/events", payload: body })).json().event.id;
+  const names = (r: { json(): { event: { attendees: { user: { id: string } }[] } } }) => r.json().event.attendees.map((a) => a.user.id);
+  await as("student2", { method: "POST", url: `/api/events/${id}/attend` });
+  assert.deepEqual(names(await as("student2", { method: "POST", url: `/api/events/${id}/attend` })), [users.student2.id]);
+  assert.deepEqual(names(await as("student2", { method: "DELETE", url: `/api/events/${id}/attend` })), []);
+});

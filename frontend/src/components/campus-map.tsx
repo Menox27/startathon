@@ -1,111 +1,128 @@
 "use client";
 
-import type { Role } from "@/lib/api";
-import { BUILDING_SHAPES, SIM_LOCATIONS } from "@/lib/campus";
-import { useBuildings } from "@/lib/queries";
+import { format, parseISO } from "date-fns";
+import { de } from "date-fns/locale";
+import { CalendarDays, Clock, Users, X } from "lucide-react";
+import type { User } from "@/lib/api";
+import { CAMPUSES, SHAPE_BY_ID, SIM_LOCATIONS, type CampusId } from "@/lib/campus";
+import { overlapsDay, useBuildings, useEvents } from "@/lib/queries";
 import { useCampusStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
-import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { EventFormDialog } from "./calendar-section";
+import { CampusSvg } from "./campus-svg";
+import { Card } from "./ui/card";
 
-const TREES = [
-  [300, 245], [520, 250], [560, 262], [285, 470], [770, 490], [20, 230], [780, 260], [300, 30],
-];
-
-/** Static, non-pannable campus map. Only buildings are interactive. */
-export function CampusMap({ role }: { role: Role }) {
+export function CampusMap({ user }: { user: User }) {
+  const { campus, setCampus, day, selectedBuildingId, selectBuilding, connectEnabled, simLocation, openEvent } = useCampusStore();
+  const events = useEvents();
   const buildings = useBuildings();
-  const { selectedBuildingId, selectBuilding, connectEnabled, simLocation } = useCampusStore();
-  const byId = new Map(buildings.data?.map((b) => [b.id, b]));
+
+  const dayEvents = (events.data ?? []).filter((e) => e.status !== "REJECTED" && overlapsDay(e, day));
+  const counts: Record<string, number> = {};
+  for (const e of dayEvents) counts[e.buildingId] = (counts[e.buildingId] ?? 0) + 1;
+  const onCampus = dayEvents.filter((e) => SHAPE_BY_ID[e.buildingId]?.campus === campus).length;
+
+  const presence = connectEnabled ? Object.fromEntries((buildings.data ?? []).map((b) => [b.id, b.presenceCount])) : undefined;
   const sim = SIM_LOCATIONS[simLocation];
+  const marker = connectEnabled && user.role === "STUDENT" && sim.campus === campus ? sim : null;
+
+  const selected = selectedBuildingId ? buildings.data?.find((b) => b.id === selectedBuildingId) : undefined;
+  const selectedEvents = dayEvents.filter((e) => e.buildingId === selectedBuildingId);
 
   return (
-    <Card>
-      <CardHeader className="flex-row items-end justify-between">
-        <div>
-          <CardTitle>Campus-Karte</CardTitle>
-          <CardDescription>Heutige Events und – mit „Connect to others“ – anonyme Belegung ab 3 Personen.</CardDescription>
-        </div>
-        {buildings.isError && <span className="text-xs text-destructive">Karte konnte nicht laden</span>}
-      </CardHeader>
-      <div className="px-3 pb-3">
-        <svg viewBox="0 0 800 520" className="h-auto w-full select-none rounded-lg" role="group" aria-label="Campus-Karte">
-          <rect width="800" height="520" fill="#e8f1e4" />
-          {/* paths */}
-          <path d="M0 245 H800 M290 0 V520 M545 0 V520" stroke="#f8f5ec" strokeWidth="26" fill="none" />
-          <path d="M0 245 H800 M290 0 V520 M545 0 V520" stroke="#e3dccb" strokeWidth="1" strokeDasharray="6 8" fill="none" />
-          {TREES.map(([x, y]) => (
-            <circle key={`${x}-${y}`} cx={x} cy={y} r="9" fill="#b9d6ad" />
+    <Card className="relative h-full overflow-hidden">
+      <CampusSvg
+        campus={campus}
+        label={`Karte ${CAMPUSES[campus].label}`}
+        eventCounts={counts}
+        presence={presence}
+        selectedId={selectedBuildingId}
+        onSelect={(id) => selectBuilding(selectedBuildingId === id ? null : id)}
+        marker={marker}
+        viewBox="-20 -90 840 640"
+        className="absolute inset-0 h-full w-full"
+      />
+
+      <div className="absolute top-4 left-4 flex flex-wrap items-center gap-2 pr-16">
+        <div className="glass-pill flex rounded-full p-1" role="group" aria-label="Campus wählen">
+          {(Object.keys(CAMPUSES) as CampusId[]).map((id) => (
+            <button
+              key={id}
+              type="button"
+              aria-pressed={campus === id}
+              onClick={() => setCampus(id)}
+              className={cn(
+                "h-9 cursor-pointer rounded-full px-4 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+                campus === id ? "bg-foreground text-white shadow-sm" : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {CAMPUSES[id].label}
+            </button>
           ))}
-
-          {BUILDING_SHAPES.map((s) => {
-            const b = byId.get(s.id);
-            const events = b?.events.length ?? 0;
-            const count = connectEnabled ? b?.presenceCount : null;
-            const selected = selectedBuildingId === s.id;
-            return (
-              <g
-                key={s.id}
-                role="button"
-                tabIndex={0}
-                aria-pressed={selected}
-                aria-label={`${s.label}: ${events} Events heute${count ? `, ${count} Studierende` : ""}`}
-                className="group cursor-pointer focus:outline-none"
-                onClick={() => selectBuilding(selected ? null : s.id)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    selectBuilding(selected ? null : s.id);
-                  }
-                }}
-              >
-                <rect
-                  x={s.x}
-                  y={s.y}
-                  width={s.w}
-                  height={s.h}
-                  rx="10"
-                  className={cn(
-                    "stroke-2 transition-colors",
-                    selected ? "fill-[#dbe6fd] stroke-primary" : "fill-white stroke-[#c5cedb] group-hover:fill-[#f0f4fd] group-focus-visible:stroke-primary",
-                  )}
-                />
-                <text
-                  x={s.x + s.w / 2}
-                  y={s.y + s.h / 2 - 4}
-                  textAnchor="middle"
-                  className="pointer-events-none fill-slate-800 text-[16px] font-semibold"
-                >
-                  {s.label}
-                </text>
-                {events > 0 && (
-                  <g transform={`translate(${s.x + s.w / 2}, ${s.y + s.h / 2 + 20})`} className="pointer-events-none">
-                    <rect x="-46" y="-11" width="92" height="22" rx="11" className="fill-primary" />
-                    <text textAnchor="middle" y="4" className="fill-white text-[12px] font-medium">
-                      {events} {events === 1 ? "Event" : "Events"} heute
-                    </text>
-                  </g>
-                )}
-                {count != null && (
-                  <g transform={`translate(${s.x + s.w - 12}, ${s.y + 12})`} className="pointer-events-none">
-                    <rect x="-52" y="0" width="52" height="22" rx="11" className="fill-success" />
-                    <text x="-26" y="15" textAnchor="middle" className="fill-white text-[12px] font-semibold">
-                      👥 {count}
-                    </text>
-                  </g>
-                )}
-              </g>
-            );
-          })}
-
-          {/* Local-only marker of the simulated device position; it is never sent anywhere. */}
-          {connectEnabled && role === "STUDENT" && sim.x > 0 && (
-            <g transform={`translate(${sim.x}, ${sim.y})`} className="pointer-events-none">
-              <circle r="14" className="fill-primary/20" />
-              <circle r="6" className="fill-primary stroke-white stroke-2" />
-            </g>
-          )}
-        </svg>
+        </div>
+        <p className="glass-pill flex h-11 items-center gap-2 rounded-full px-4 text-sm" aria-live="polite">
+          <CalendarDays className="h-4 w-4 text-primary" />
+          <span className="font-medium">{format(parseISO(day), "EEE, d. MMM", { locale: de })}</span>
+          <span className="text-muted-foreground tabular-nums">
+            · {onCampus} {onCampus === 1 ? "Event" : "Events"}
+          </span>
+        </p>
       </div>
+
+      <div className="absolute top-4 right-4">
+        <EventFormDialog user={user} />
+      </div>
+
+      {selected && (
+        <div className="glass absolute right-4 bottom-4 left-4 max-h-[60%] overflow-y-auto rounded-3xl p-4 sm:right-auto sm:w-[340px]">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h3 className="font-semibold">{selected.name}</h3>
+              {selected.description && <p className="text-sm text-muted-foreground">{selected.description}</p>}
+            </div>
+            <button
+              onClick={() => selectBuilding(null)}
+              aria-label="Gebäude schließen"
+              className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full bg-muted text-muted-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+          {connectEnabled && (
+            <p className="mt-3 flex items-center gap-2 text-sm">
+              <Users className="h-4 w-4 text-success" />
+              {selected.presenceCount != null ? `${selected.presenceCount} Kommiliton:innen gerade hier` : "Unter 3 Personen – aus Datenschutzgründen verborgen"}
+            </p>
+          )}
+          {selectedEvents.length === 0 ? (
+            <p className="mt-3 text-sm text-muted-foreground">An diesem Tag keine Events hier.</p>
+          ) : (
+            <ul className="mt-3 space-y-1">
+              {selectedEvents.map((e) => (
+                <li key={e.id}>
+                  <button
+                    onClick={() => openEvent(e.id)}
+                    className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-2xl px-3 py-2 text-left hover:bg-white/80 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                  >
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-medium">{e.title}</span>
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground tabular-nums">
+                        <Clock className="h-3 w-3" />
+                        {format(new Date(e.startTime), "HH:mm")}–{format(new Date(e.endTime), "HH:mm")}
+                      </span>
+                    </span>
+                    <span className="shrink-0 text-xs text-muted-foreground tabular-nums">{e.attendees.length} dabei</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+
+      {events.isError && (
+        <p className="glass-pill absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full px-4 py-2 text-sm text-destructive">Events konnten nicht geladen werden.</p>
+      )}
     </Card>
   );
 }

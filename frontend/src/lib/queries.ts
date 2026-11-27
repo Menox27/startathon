@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { endOfDay, parseISO, startOfDay } from "date-fns";
 import { useEffect, useRef } from "react";
-import { api, ApiError, type Building, type Role, type User } from "./api";
+import { api, ApiError, type Building, type CampusEvent, type Role, type User } from "./api";
 import { locateBuilding, SIM_LOCATIONS } from "./campus";
 import { useCampusStore } from "./store";
 
@@ -25,6 +26,18 @@ export const useBuildings = () =>
     select: (d) => d.buildings,
     refetchInterval: 30_000,
   });
+
+// shortcut: loads every visible event once and filters per day client-side; switch to ?from&to ranges when there are thousands.
+export const useEvents = () =>
+  useQuery({
+    queryKey: ["events", "all"],
+    queryFn: () => api<{ events: CampusEvent[] }>("/api/events"),
+    select: (d) => d.events,
+    refetchInterval: 30_000,
+  });
+
+export const overlapsDay = (e: CampusEvent, day: string) =>
+  new Date(e.startTime) <= endOfDay(parseISO(day)) && new Date(e.endTime) >= startOfDay(parseISO(day));
 
 /** The building the (simulated) device is in, or null when opted out / outside every building. */
 export function useCurrentBuilding(role: Role) {

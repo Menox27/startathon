@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc -l src/components/*.tsx src/components/ui/*.tsx src/lib/* src/app/*)",
+      "Bash(cd \"c:/Users/LeoKu/Documents/_THWS/01_Projects/startathon/frontend/src\" && cat components/chat-section.tsx components/ui/badge.tsx components/ui/input.tsx components/ui/switch.tsx components/ui/tabs.tsx app/page.tsx; head -40 components/login-screen.tsx; cat ../../.claude/launch.json)",
+      "Read(//c/Users/LeoKu/Documents/_THWS/.claude/**)",
+      "Bash(python -)",
+      "Bash(npx prisma *)",
+      "Bash(netstat -ano)",
+      "Bash(npx tsc *)",
+      "Bash(\"C:/Users/LeoKu/.claude/plugins/cache/impeccable/impeccable/4.10.0/skills/impeccable/scripts/impeccable\" shot *)"
+    ]
+  }
+}

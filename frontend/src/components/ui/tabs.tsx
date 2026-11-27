@@ -14,7 +14,7 @@ export function TabsTrigger({ className, ...props }: React.ComponentProps<typeof
     <TabsPrimitive.Trigger
       className={cn(
         "inline-flex cursor-pointer items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors",
-        "data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm",
+        "data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-sm",
         className,
       )}
       {...props}

@@ -14,6 +14,7 @@ export type CampusEvent = {
   endTime: string;
   status: EventStatus;
   createdBy: PublicUser;
+  attendees: { user: PublicUser }[];
 };
 export type Building = {
   id: string;

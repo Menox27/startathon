@@ -10,16 +10,16 @@ export const DialogTrigger = DialogPrimitive.Trigger;
 export function DialogContent({ className, children, ...props }: React.ComponentProps<typeof DialogPrimitive.Content>) {
   return (
     <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-slate-950/40" />
+      <DialogPrimitive.Overlay className="veil fixed inset-0 z-50 bg-slate-900/25 backdrop-blur-[2px]" />
       <DialogPrimitive.Content
         className={cn(
-          "fixed top-1/2 left-1/2 z-50 grid w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl border border-border bg-card p-6 shadow-lg",
+          "sheet glass fixed top-1/2 left-1/2 z-50 grid max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto rounded-[28px] p-6 [background:rgb(255_255_255/0.84)]",
           className,
         )}
         {...props}
       >
         {children}
-        <DialogPrimitive.Close className="absolute top-4 right-4 cursor-pointer rounded-sm opacity-60 hover:opacity-100" aria-label="Schließen">
+        <DialogPrimitive.Close className="absolute top-4 right-4 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-white/85 text-muted-foreground shadow-sm hover:bg-white hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none" aria-label="Schließen">
           <XIcon className="h-4 w-4" />
         </DialogPrimitive.Close>
       </DialogPrimitive.Content>

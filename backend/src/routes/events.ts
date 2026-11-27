@@ -14,6 +14,7 @@ export const eventSelect = {
   endTime: true,
   status: true,
   createdBy: { select: { id: true, fullName: true, role: true } },
+  attendees: { orderBy: { createdAt: "asc" }, select: { user: { select: { id: true, fullName: true, role: true } } } },
 } satisfies Prisma.EventSelect;
 
 const createEventBody = z
@@ -67,4 +68,24 @@ export async function eventRoutes(app: FastifyInstance) {
     const event = await prisma.event.update({ where: { id }, data: { status }, select: eventSelect });
     return { event };
   });
+
+  // Sign up / withdraw. Only approved events accept attendees.
+  for (const method of ["POST", "DELETE"] as const) {
+    app.route({
+      method,
+      url: "/api/events/:id/attend",
+      handler: async (req) => {
+        const { id } = z.object({ id: z.string() }).parse(req.params);
+        const key = { eventId: id, userId: req.user.sub };
+        const found = await prisma.event.findUnique({ where: { id }, select: { status: true } });
+        if (found?.status !== "APPROVED") fail(404, "Event not found");
+        if (method === "POST") {
+          await prisma.eventAttendee.upsert({ where: { eventId_userId: key }, update: {}, create: key });
+        } else {
+          await prisma.eventAttendee.deleteMany({ where: key });
+        }
+        return { event: await prisma.event.findUnique({ where: { id }, select: eventSelect }) };
+      },
+    });
+  }
 }

@@ -21,4 +21,11 @@ export const BUILDINGS = [
   { id: "laborbau", name: "Laborbau", description: "Labore Maschinenbau & E-Technik" },
   { id: "audimax", name: "Audimax", description: "Großer Hörsaal, 800 Plätze" },
   { id: "verwaltungsbau", name: "Verwaltungsbau", description: "Studierendenservice & Hochschulbüro" },
+  // Campus Nord
+  { id: "technikum", name: "Technikum", description: "Werkstätten, Robotik- & Fahrzeuglabor" },
+  { id: "seminarbau", name: "Seminarbau", description: "Seminarräume S1–S24" },
+  { id: "cafeteria", name: "Cafeteria Nord", description: "Snacks & Kaffee 8:00–17:00" },
+  { id: "gruenderzentrum", name: "Gründerzentrum", description: "Coworking & Start-up-Beratung" },
+  { id: "designwerkstatt", name: "Designwerkstatt", description: "Ateliers, 3D-Druck & Fotostudio" },
+  { id: "sporthalle", name: "Sporthalle", description: "Hochschulsport, Kletterwand" },
 ];
